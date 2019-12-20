@@ -1,14 +1,21 @@
 #include <GL/freeglut.h>
 #include <iostream>
+#include <fstream>
+
+#include <CImg.h>
 
 GLfloat alrRotX, alrRotY;
 GLfloat XROTATE = 0, YROTATE = -0.1;
 GLfloat rotateAbit = 1, deltaRotAbit = 0.1;
-
+GLfloat A = 1.f;
 GLfloat pos[4] = {2,0,5.5,1};
-
+int dmode = 1;
+float diverge = 0.05;
+bool btext = false;
 GLfloat range = -5;
 
+void draw3();
+void draw4();
 
 void init(void)
 {
@@ -21,9 +28,214 @@ void init(void)
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     glEnable(GL_TEXTURE_2D);
+    //glShadeModel(GL_FLAT);
+
+    draw3();
+    draw4();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+}
+
+GLuint glLabs[3];
+void draw3()
+{
+    glLabs[0] = glGenLists(3);
+
+    if(!glIsList(glLabs[0]))
+    {
+        std::cerr << "CRITICAL ERROR glGENLISTS!!!!!!!!!!\n";
+        return;
+    }
+
+    glNewList(glLabs[0],GL_COMPILE);
+
+    glBegin(GL_TRIANGLES);
+
+    glColor4f(1.0,0.5,0.0,A);    //// оранжевый
+    glNormal3f(1,1,1);
+    glVertex3f( 1 + diverge, 0 + diverge, 0 + diverge);
+    glVertex3f( 0 + diverge, 1 + diverge, 0 + diverge);
+    glVertex3f( 0 + diverge, 0 + diverge, 1 + diverge);
+
+
+    glColor4f(1.0,0.9,0.0,A);    //// желтый
+    glNormal3f(-1,1,-1);
+    glVertex3f( 1+diverge, 0-diverge, 0+diverge);
+    glVertex3f( 0+diverge,-1-diverge, 0+diverge);
+    glVertex3f( 0+diverge, 0-diverge, 1+diverge);
+
+
+    glColor4f(0.8,0.0,0.8,A);    //// фиолет
+    glNormal3f(-1,-1,1);
+    glVertex3f(-1-diverge, 0-diverge, 0+diverge);
+    glVertex3f( 0-diverge,-1-diverge, 0+diverge);
+    glVertex3f( 0-diverge, 0-diverge, 1+diverge);
+
+    glColor4f(0.0,1.0,0.0,A);    ////зеленый
+    glNormal3f(1,-1,-1);
+    glVertex3f(-1-diverge, 0+diverge, 0+diverge);
+    glVertex3f( 0-diverge, 1+diverge, 0+diverge);
+    glVertex3f( 0-diverge, 0+diverge, 1+diverge);
+
+    glColor4f(0.0,0.9,0.9,A);    //// голубой
+    glNormal3f(-1,-1,1);
+    glVertex3f( 1+diverge, 0+diverge, 0-diverge);
+    glVertex3f( 0+diverge, 1+diverge, 0-diverge);
+    glVertex3f( 0+diverge, 0+diverge,-1-diverge);
+
+    glColor4f(0.0,0.0,1.0,A);    //// синий
+    glNormal3f(1,-1,-1);
+    glVertex3f( 1+diverge, 0-diverge, 0-diverge);
+    glVertex3f( 0+diverge,-1-diverge, 0-diverge);
+    glVertex3f( 0+diverge, 0-diverge,-1-diverge);
+
+    glColor4f(1.0,0.0,0.0,A);    //// красный
+    glNormal3f(1,1,1);
+    glVertex3f(-1-diverge, 0-diverge, 0-diverge);
+    glVertex3f( 0-diverge,-1-diverge, 0-diverge);
+    glVertex3f( 0-diverge, 0-diverge,-1-diverge);
+
+    glNormal3f(-1,1,-1);
+    glColor4f(1.0,0.0,0.0,A);
+    glVertex3f(-1-diverge, 0+diverge, 0-diverge);
+
+    glColor4f(0.0,1.0,0.0,A);
+    glVertex3f( 0-diverge, 1+diverge, 0-diverge);
+
+    glColor4f(0.0,0.0,1.0,A);
+    glVertex3f( 0-diverge, 0+diverge,-1-diverge);
+
+    glEnd();
+
+    glEndList();
+
+}
+
+typedef struct T_GL_DATA {
+    size_t width, height;
+    unsigned char *data;
+} TGL;
+
+GLuint textures[8];
+TGL texts[8];
+using namespace cimg_library;
+void draw4()
+{
+    const char* txrs[]{ "wall.bmp",
+                        "billi.bmp",
+                        "wood.bmp",
+                        "grass.bmp",
+                        "terrain.bmp",
+                        "dirt.bmp",
+                        "diamonds.bmp",
+                        "ricardo.bmp"};
+
+    CImg<unsigned char> *src = new CImg<unsigned char>();
+
+
+
+
+    glGenTextures(8, textures);
+    for(int i = 0; i < 8; i++) {
+        src->load_bmp(txrs[i]);
+
+        texts[i].width = src->width();
+        texts[i].height = src->height();
+        texts[i].data = new unsigned char[src->size()];
+        memcpy(texts[i].data, src->data(), src->size());
+        std::cout << src->size() << std::endl;
+
+        src->clear();
+
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_NEAREST );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_NEAREST );
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texts[i].width, texts[i].height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                     texts[i].data);
+    }
+
+    delete src;
+
+    glLabs[1] = glGenLists(3);
+
+    if(!glIsList(glLabs[1]))
+    {
+        std::cerr << "CRITICAL ERROR glGENLISTS!!!!!!!!!!\n";
+        return;
+    }
+
+    glNewList(glLabs[1],GL_COMPILE);
+
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(1,1,1);
+    glTexCoord2f(0, 0);     glVertex3f(1+diverge,0+diverge,0+diverge);
+    glTexCoord2f(1, 0);     glVertex3f(0+diverge,1+diverge,0+diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f(0+diverge,0+diverge,1+diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(-1,1,-1);
+    glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0-diverge, 0+diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0+diverge,-1-diverge, 0+diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0-diverge, 1+diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[2]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(-1,-1,1);
+    glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0-diverge, 0+diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0-diverge,-1-diverge, 0+diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0-diverge, 1+diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[3]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(1,-1,-1);
+    glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0+diverge, 0+diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0-diverge, 1+diverge, 0+diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0+diverge, 1+diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[4]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(-1,-1,1);
+    glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0+diverge, 0-diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0+diverge, 1+diverge, 0-diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0+diverge,-1-diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[5]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(1,-1,-1);
+    glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0-diverge, 0-diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0+diverge,-1-diverge, 0-diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0-diverge,-1-diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[6]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(1,1,1);
+    glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0-diverge, 0-diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0-diverge,-1-diverge, 0-diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0-diverge,-1-diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[7]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(-1,1,-1);
+    glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0+diverge, 0-diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0-diverge, 1+diverge, 0-diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0+diverge,-1-diverge);
+
+    glEnd();
+
+    glEndList();
+
 }
 
 void display(void)
@@ -32,10 +244,12 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+
     glTranslatef(0,0,range);
     glRotatef(rotateAbit,0.0,1.0,0.0);
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
-    glTranslatef(pos[0], pos[1], pos[2]);
+
+        glLightfv(GL_LIGHT0, GL_POSITION, pos);
+        glTranslatef(pos[0], pos[1], pos[2]);
 
 
     glColor3f(1.0,1.0,1.0);
@@ -47,69 +261,12 @@ void display(void)
 
     glLoadIdentity();
     glTranslatef(0,0,range);
-    glRotatef(alrRotX,1.0,0.0,0.0);
-    glRotatef(alrRotY,0.0,1.0,0.0);
+    glRotatef(alrRotY,1.0,0.0,0.0);
+    glRotatef(alrRotX,0.0,1.0,0.0);
 
-    glBegin(GL_TRIANGLES);
-
-
-            glColor3f(1.0,0.5,0.0);    //// оранжевый
-            glNormal3f(1,1,1);
-            glVertex3f( 1, 0 + 0.1, 0 + 0.1);
-            glVertex3f( 0 + 0.1, 1 + 0.1, 0 + 0.1);
-            glVertex3f( 0 + 0.1, 0 + 0.1, 1 + 0.1);
-
-
-            glColor3f(1.0,0.9,0.0);    //// желтый
-            glNormal3f(-1,1,-1);
-            glVertex3f( 1+0.1, 0-0.1, 0+0.1);
-            glVertex3f( 0+0.1,-1-0.1, 0+0.1);
-            glVertex3f( 0+0.1, 0-0.1, 1+0.1);
-
-
-            glColor3f(0.8,0.0,0.8);    //// фиолет
-            glNormal3f(-1,-1,1);
-            glVertex3f(-1-0.1, 0-0.1, 0+0.1);
-            glVertex3f( 0-0.1,-1-0.1, 0+0.1);
-            glVertex3f( 0-0.1, 0-0.1, 1+0.1);
-
-            glColor3f(0.0,1.0,0.0);    ////зеленый
-            glNormal3f(1,-1,-1);
-            glVertex3f(-1-0.1, 0+0.1, 0+0.1);
-            glVertex3f( 0-0.1, 1+0.1, 0+0.1);
-            glVertex3f( 0-0.1, 0+0.1, 1+0.1);
-
-            glColor3f(0.0,0.9,0.9);    //// голубой
-            glNormal3f(-1,-1,1);
-            glVertex3f( 1+0.1, 0+0.1, 0-0.1);
-            glVertex3f( 0+0.1, 1+0.1, 0-0.1);
-            glVertex3f( 0+0.1, 0+0.1,-1-0.1);
-
-            glColor3f(0.0,0.0,1.0);    //// синий
-            glNormal3f(1,-1,-1);
-            glVertex3f( 1+0.1, 0-0.1, 0-0.1);
-            glVertex3f( 0+0.1,-1-0.1, 0-0.1);
-            glVertex3f( 0+0.1, 0-0.1,-1-0.1);
-
-            glColor3f(1.0,0.0,0.0);    //// красный
-            glNormal3f(1,1,1);
-            glVertex3f(-1-0.1, 0-0.1, 0-0.1);
-            glVertex3f( 0-0.1,-1-0.1, 0-0.1);
-            glVertex3f( 0-0.1, 0-0.1,-1-0.1);
-
-            glNormal3f(-1,1,-1);
-
-            glColor3f(1.0,0.0,0.0);
-            glVertex3f(-1-0.1, 0+0.1, 0-0.1);
-
-            glColor3f(0.0,1.0,0.0);
-            glVertex3f( 0-0.1, 1+0.1, 0-0.1);
-
-            glColor3f(0.0,0.0,1.0);
-            glVertex3f( 0-0.1, 0+0.1,-1-0.1);
-
-    glEnd();
-
+    glIsEnabled(GL_TEXTURE_2D) ?
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE) : void();
+    glCallList(glLabs[dmode-1]);
 
     glFlush();
 
@@ -119,8 +276,7 @@ void display(void)
 void loop(int time)
 {
     rotateAbit += deltaRotAbit;
-    alrRotX += XROTATE;
-    alrRotY += YROTATE;
+
 
     glutPostRedisplay();
     glutTimerFunc(5,loop,5);
@@ -139,10 +295,51 @@ void reshape(int w, int h)
     glViewport(0,0,w,h);
 }
 
+void keyboard(unsigned char c, int x, int y)
+{
+
+    switch(c)
+    {
+
+        case 'l':
+            glIsEnabled(GL_LIGHT0) ? glDisable(GL_LIGHT0) : glEnable(GL_LIGHT0);
+            break;
+
+        case '1':
+            dmode = 1;
+            glDisable(GL_TEXTURE_2D);
+            break;
+        case '2':
+            dmode = 2;
+            glEnable(GL_TEXTURE_2D);
+            break;
+
+        case 'd':
+            alrRotX+=10;
+            break;
+        case 'a':
+            alrRotX-=10;
+            break;
+        case 'w':
+            alrRotY+=10;
+            break;
+        case 's':
+            alrRotY-=10;
+            break;
+        case 'q':
+            alrRotY = alrRotX = 0;
+            break;
+        case 'z':
+            A == 1 ? A = 0.2f : A=1.f;
+            break;
+
+    }
+}
+
 int main(int argc, char** argv){
 
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+    glutInitDisplayMode(GLUT_SINGLE|GLUT_RGBA);
     glutInitWindowSize(1600,900);
     glutInitWindowPosition(100, 100);
     glutCreateWindow(argv[0]);
@@ -152,6 +349,7 @@ int main(int argc, char** argv){
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
 
     glutTimerFunc(100,loop,100);
 
