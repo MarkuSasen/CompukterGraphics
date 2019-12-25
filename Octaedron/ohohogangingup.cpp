@@ -7,7 +7,6 @@
 GLfloat alrRotX, alrRotY;
 GLfloat XROTATE = 0, YROTATE = -0.1;
 GLfloat rotateAbit = 1, deltaRotAbit = 0.1;
-GLfloat A = 1.f;
 GLfloat pos[4] = {2,0,5.5,1};
 int dmode = 1;
 float diverge = 0.05;
@@ -16,6 +15,8 @@ GLfloat range = -5;
 
 void draw3();
 void draw4();
+void draw7();
+
 
 void init(void)
 {
@@ -30,20 +31,23 @@ void init(void)
     glEnable(GL_TEXTURE_2D);
     //glShadeModel(GL_FLAT);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND); //Enable blending.
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set blending function.
 
     glMatrixMode(GL_MODELVIEW);
     glTranslatef(0,0,range);
     draw3();
     draw4();
-
+    draw7();
 
 }
+GLfloat AlphaChannel = 1.f;
 
 GLuint glLabs[3];
 void draw3()
 {
+    glDeleteLists(glLabs[0], 1);
+
     glLabs[0] = glGenLists(3);
 
     if(!glIsList(glLabs[0]))
@@ -56,58 +60,58 @@ void draw3()
 
     glBegin(GL_TRIANGLES);
 
-    glColor4f(1.0,0.5,0.0,A);    //// оранжевый
+    glColor4f(1.0,0.5,0.0, AlphaChannel);    //// оранжевый
     glNormal3f(1,1,1);
     glVertex3f( 1 + diverge, 0 + diverge, 0 + diverge);
     glVertex3f( 0 + diverge, 1 + diverge, 0 + diverge);
     glVertex3f( 0 + diverge, 0 + diverge, 1 + diverge);
 
 
-    glColor4f(1.0,0.9,0.0,A);    //// желтый
+    glColor4f(1.0,0.9,0.0, AlphaChannel);    //// желтый
     glNormal3f(-1,1,-1);
     glVertex3f( 1+diverge, 0-diverge, 0+diverge);
     glVertex3f( 0+diverge,-1-diverge, 0+diverge);
     glVertex3f( 0+diverge, 0-diverge, 1+diverge);
 
 
-    glColor4f(0.8,0.0,0.8,A);    //// фиолет
+    glColor4f(0.8,0.0,0.8, AlphaChannel);    //// фиолет
     glNormal3f(-1,-1,1);
     glVertex3f(-1-diverge, 0-diverge, 0+diverge);
     glVertex3f( 0-diverge,-1-diverge, 0+diverge);
     glVertex3f( 0-diverge, 0-diverge, 1+diverge);
 
-    glColor4f(0.0,1.0,0.0,A);    ////зеленый
+    glColor4f(0.0,1.0,0.0, AlphaChannel);    ////зеленый
     glNormal3f(1,-1,-1);
     glVertex3f(-1-diverge, 0+diverge, 0+diverge);
     glVertex3f( 0-diverge, 1+diverge, 0+diverge);
     glVertex3f( 0-diverge, 0+diverge, 1+diverge);
 
-    glColor4f(0.0,0.9,0.9,A);    //// голубой
+    glColor4f(0.0,0.9,0.9, AlphaChannel);    //// голубой
     glNormal3f(-1,-1,1);
     glVertex3f( 1+diverge, 0+diverge, 0-diverge);
     glVertex3f( 0+diverge, 1+diverge, 0-diverge);
     glVertex3f( 0+diverge, 0+diverge,-1-diverge);
 
-    glColor4f(0.0,0.0,1.0,A);    //// синий
+    glColor4f(0.0,0.0,1.0, AlphaChannel);    //// синий
     glNormal3f(1,-1,-1);
     glVertex3f( 1+diverge, 0-diverge, 0-diverge);
     glVertex3f( 0+diverge,-1-diverge, 0-diverge);
     glVertex3f( 0+diverge, 0-diverge,-1-diverge);
 
-    glColor4f(1.0,0.0,0.0,A);    //// красный
+    glColor4f(1.0,0.0,0.0, AlphaChannel);    //// красный
     glNormal3f(1,1,1);
     glVertex3f(-1-diverge, 0-diverge, 0-diverge);
     glVertex3f( 0-diverge,-1-diverge, 0-diverge);
     glVertex3f( 0-diverge, 0-diverge,-1-diverge);
 
     glNormal3f(-1,1,-1);
-    glColor4f(1.0,0.0,0.0,A);
+    glColor4f(1.0,0.0,0.0, AlphaChannel);
     glVertex3f(-1-diverge, 0+diverge, 0-diverge);
 
-    glColor4f(0.0,1.0,0.0,A);
+    glColor4f(0.0,1.0,0.0, AlphaChannel);
     glVertex3f( 0-diverge, 1+diverge, 0-diverge);
 
-    glColor4f(0.0,0.0,1.0,A);
+    glColor4f(0.0,0.0,1.0, AlphaChannel);
     glVertex3f( 0-diverge, 0+diverge,-1-diverge);
 
     glEnd();
@@ -241,27 +245,118 @@ void draw4()
 
 }
 
+void olala(GLfloat x, GLfloat y, GLfloat z) {
+    int p = 11;
+    glNormal3f(1,1,1);
+
+    for(int i = 0; i<p; i+=2)
+    {
+        glNormal3f(1,1,1);
+        glBegin(GL_POLYGON);
+
+        glVertex3f( x/p*i       ,y-y/p*i    ,0          );
+        glVertex3f( 0           ,y-y/p*i    ,z/p*i      );
+        glVertex3f( 0           ,y-y/p*(i+1),z/p*(i+1)  );
+        glVertex3f( x/p*(i+1)   ,y-y/p*(i+1),0          );
+
+        glEnd();
+    }
+};
+
+
+void draw7() {
+
+    glDeleteLists(glLabs[2], 1);
+    glLabs[2] = glGenLists(4);
+
+    if (!glIsList(glLabs[2])) {
+        std::cerr << "CRITICAL ERROR glGENLISTS!!!!!!!!!!\n";
+        return;
+    }
+
+    glNewList(glLabs[2],GL_COMPILE);
+        glMatrixMode(GL_MODELVIEW);
+
+    glPushMatrix();
+        glTranslatef(diverge,diverge,diverge);
+        glColor4f(1.0f,0.0f,0.0f,AlphaChannel);
+        olala(1.f,1.f,1.f);
+        glTranslatef(-diverge,-diverge,-diverge);
+        glRotatef(90.f,0.0f,1.0f,0.0f);
+
+        glTranslatef(diverge,diverge,diverge);
+        glColor4f(1.0f,0.5f,0.0f,AlphaChannel);
+        olala(1.f,1.f,1.f);
+        glTranslatef(-diverge,-diverge,-diverge);
+        glRotatef(90.f,0.0f,1.0f,0.0f);
+
+        glTranslatef(diverge,diverge,diverge);
+        glColor4f(1.0f,0.9f,0.0f,AlphaChannel);
+        olala(1.f,1.f,1.f);
+        glTranslatef(-diverge,-diverge,-diverge);
+        glRotatef(90.f,0.0f,1.0f,0.0f);
+
+        glTranslatef(diverge,diverge,diverge);
+        glColor4f(0.0f,1.0f,0.0f,AlphaChannel);
+        olala(1.f,1.f,1.f);
+        glTranslatef(-diverge,-diverge,-diverge);
+        glRotatef(90.f,0.0f,1.0f,0.0f);
+
+        glRotatef(180.f,1.0f,0.0f,0.0f);
+
+        glTranslatef(diverge,diverge,diverge);
+        glColor4f(0.0f,0.9f,0.9f,AlphaChannel);
+        olala(1.f,1.f,1.f);
+        glTranslatef(-diverge,-diverge,-diverge);
+        glRotatef(90.f,0.0f,1.0f,0.0f);
+
+        glTranslatef(diverge,diverge,diverge);
+        glColor4f(0.0f,0.0f,1.0f,AlphaChannel);
+        olala(1.f,1.f,1.f);
+        glTranslatef(-diverge,-diverge,-diverge);
+        glRotatef(90.f,0.0f,1.0f,0.0f);
+
+        glTranslatef(diverge,diverge,diverge);
+        glColor4f(0.8f,0.0f,0.8f,AlphaChannel);
+        olala(1.f,1.f,1.f);
+        glTranslatef(-diverge,-diverge,-diverge);
+        glRotatef(90.f,0.0f,1.0f,0.0f);
+
+        glTranslatef(diverge,diverge,diverge);
+        glColor4f(1.0f,0.0f,0.0f,AlphaChannel);
+        olala(1.f,1.f,1.f);
+        glTranslatef(-diverge,-diverge,-diverge);
+    glPopMatrix();
+
+    glEndList();
+}
+
+
+GLboolean lm = true;
+
 void display(void)
 {
     glMatrixMode(GL_MODELVIEW);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glPushMatrix();
-    glLoadIdentity();
+
+        glPushMatrix();
+        glLoadIdentity();
+
+        glTranslatef(0, 0, range);
+        glRotatef(rotateAbit, 0.0, 1.0, 0.0);
+
+        glLightfv(GL_LIGHT0, GL_POSITION, pos);
+        glTranslatef(pos[0], pos[1], pos[2]);
+
+        glColor4d(1.0, 1.0, 1.0, 1.0);
+        GLUquadricObj *quad = gluNewQuadric();
+        gluQuadricDrawStyle(quad, GLU_LINE);
+        gluSphere(quad, 0.25, 10, 10);
+
+        glPopMatrix();
 
 
-    glTranslatef(0,0,range);
-    glRotatef(rotateAbit,0.0,1.0,0.0);
-
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
-    glTranslatef(pos[0], pos[1], pos[2]);
-
-
-    glColor4d(1.0,1.0,1.0,1.0);
-    GLUquadricObj *quad = gluNewQuadric();
-    gluQuadricDrawStyle(quad, GLU_LINE);
-    gluSphere(quad, 0.25, 10, 10);
-    glPopMatrix();
     ////////////////////////////////////////////////
 
 //    glLoadIdentity();
@@ -269,9 +364,9 @@ void display(void)
     glRotatef(alrRotY,1.0,0.0,0.0);
     glRotatef(alrRotX,0.0,1.0,0.0);
 
-    glColor4d(1.0,1.0,1.0,1.0);
+    //glColor4d(1.0,1.0,1.0,1.0);
     glIsEnabled(GL_TEXTURE_2D) ?
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE) : void();
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE) : void();
     glCallList(glLabs[dmode-1]);
 
     glFlush();
@@ -281,12 +376,12 @@ void display(void)
 GLfloat incX = 0, incY = 0;
 void loop(int time)
 {
-    rotateAbit += deltaRotAbit;
+    if(lm) rotateAbit += deltaRotAbit;
     //if(alrRotX != 0)  alrRotX+=incX;
     //if(alrRotY != 0)  alrRotY+=incY;
 
     glutPostRedisplay();
-    glutTimerFunc(5,loop,5);
+    glutTimerFunc(15,loop,15);
 }
 
 
@@ -320,6 +415,11 @@ void keyboard(unsigned char c, int x, int y)
             dmode = 2;
             glEnable(GL_TEXTURE_2D);
             break;
+        case '3':
+            dmode = 3;
+            glDisable(GL_TEXTURE_2D);
+            break;
+
 
         case 'd':
             alrRotX+=0.1;
@@ -340,13 +440,14 @@ void keyboard(unsigned char c, int x, int y)
         case 'q':
             alrRotY = alrRotX = incX = incY = 0;
             break;
-        case 'z':
-            //glEnable(GL_BLEND);
-            //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            //glDisable(GL_DEPTH_TEST);
-            A == 1.0 ? A = 0.4f : A=1.f;
+        case 'p':
+            lm = !lm;
             break;
-
+        case 'f':
+            AlphaChannel == 1.f ? AlphaChannel = 0.2f : AlphaChannel = 1.f;
+            draw3();
+            draw7();
+            break;
     }
 }
 
@@ -370,8 +471,8 @@ int main(int argc, char** argv){
     glutMainLoop();
 
     glDisable(GL_DEPTH_TEST);
-
-    glDeleteLists(glLabs[0],2);
+    glDeleteTextures(8, textures);
+    glDeleteLists(glLabs[0],3);
     return 0;
 }
 
