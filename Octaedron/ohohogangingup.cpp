@@ -19,7 +19,7 @@ void draw4();
 
 void init(void)
 {
-    glClearColor(0,0,0,0);
+    glClearColor(0,0,0,1);
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -30,11 +30,14 @@ void init(void)
     glEnable(GL_TEXTURE_2D);
     //glShadeModel(GL_FLAT);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glMatrixMode(GL_MODELVIEW);
+    glTranslatef(0,0,range);
     draw3();
     draw4();
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 }
 
@@ -242,28 +245,31 @@ void display(void)
 {
     glMatrixMode(GL_MODELVIEW);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glPushMatrix();
     glLoadIdentity();
 
 
     glTranslatef(0,0,range);
     glRotatef(rotateAbit,0.0,1.0,0.0);
 
-        glLightfv(GL_LIGHT0, GL_POSITION, pos);
-        glTranslatef(pos[0], pos[1], pos[2]);
+    glLightfv(GL_LIGHT0, GL_POSITION, pos);
+    glTranslatef(pos[0], pos[1], pos[2]);
 
 
-    glColor3f(1.0,1.0,1.0);
+    glColor4d(1.0,1.0,1.0,1.0);
     GLUquadricObj *quad = gluNewQuadric();
     gluQuadricDrawStyle(quad, GLU_LINE);
-    gluSphere(quad, 0.5, 10, 10);
-
+    gluSphere(quad, 0.25, 10, 10);
+    glPopMatrix();
     ////////////////////////////////////////////////
 
-    glLoadIdentity();
-    glTranslatef(0,0,range);
+//    glLoadIdentity();
+
     glRotatef(alrRotY,1.0,0.0,0.0);
     glRotatef(alrRotX,0.0,1.0,0.0);
 
+    glColor4d(1.0,1.0,1.0,1.0);
     glIsEnabled(GL_TEXTURE_2D) ?
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE) : void();
     glCallList(glLabs[dmode-1]);
@@ -272,11 +278,12 @@ void display(void)
 
     gluDeleteQuadric(quad);
 }
-
+GLfloat incX = 0, incY = 0;
 void loop(int time)
 {
     rotateAbit += deltaRotAbit;
-
+    //if(alrRotX != 0)  alrRotX+=incX;
+    //if(alrRotY != 0)  alrRotY+=incY;
 
     glutPostRedisplay();
     glutTimerFunc(5,loop,5);
@@ -290,7 +297,7 @@ void reshape(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(90.0,(GLdouble)w/(GLdouble)h,1,20);
+    gluPerspective(30.0,(GLdouble)w/(GLdouble)h,1,20);
     glMatrixMode(GL_MODELVIEW);
     glViewport(0,0,w,h);
 }
@@ -315,22 +322,29 @@ void keyboard(unsigned char c, int x, int y)
             break;
 
         case 'd':
-            alrRotX+=10;
+            alrRotX+=0.1;
+            incX = alrRotX;
             break;
         case 'a':
-            alrRotX-=10;
+            alrRotX-=0.1;
+            incX = alrRotX;
             break;
         case 'w':
-            alrRotY+=10;
+            alrRotY+=0.1;
+            incX = alrRotY;
             break;
         case 's':
-            alrRotY-=10;
+            alrRotY-=0.1;
+            incX = alrRotY;
             break;
         case 'q':
-            alrRotY = alrRotX = 0;
+            alrRotY = alrRotX = incX = incY = 0;
             break;
         case 'z':
-            A == 1 ? A = 0.2f : A=1.f;
+            //glEnable(GL_BLEND);
+            //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            //glDisable(GL_DEPTH_TEST);
+            A == 1.0 ? A = 0.4f : A=1.f;
             break;
 
     }
@@ -339,7 +353,7 @@ void keyboard(unsigned char c, int x, int y)
 int main(int argc, char** argv){
 
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE|GLUT_RGBA);
+    glutInitDisplayMode(GLUT_SINGLE|GLUT_RGBA|GLUT_ALPHA);
     glutInitWindowSize(1600,900);
     glutInitWindowPosition(100, 100);
     glutCreateWindow(argv[0]);
@@ -356,6 +370,8 @@ int main(int argc, char** argv){
     glutMainLoop();
 
     glDisable(GL_DEPTH_TEST);
+
+    glDeleteLists(glLabs[0],2);
     return 0;
 }
 
