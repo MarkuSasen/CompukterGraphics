@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <CImg.h>
+#include <CImg.h> //подгрузка текстур
 
 GLfloat alrRotX, alrRotY;
 GLfloat XROTATE = 0, YROTATE = -0.1;
@@ -35,7 +35,7 @@ void init(void)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set blending function.
 
     glMatrixMode(GL_MODELVIEW);
-    glTranslatef(0,0,range);
+    glTranslatef(0,0,-10);
     draw3();
     draw4();
     draw7();
@@ -43,7 +43,7 @@ void init(void)
 }
 GLfloat AlphaChannel = 1.f;
 
-GLuint glLabs[3];
+GLuint glLabs[4];
 void draw3()
 {
     glDeleteLists(glLabs[0], 1);
@@ -243,6 +243,85 @@ void draw4()
 
     glEndList();
 
+    glLabs[3] = glGenLists(5);
+
+    if(!glIsList(glLabs[3]))
+    {
+        std::cerr << "CRITICAL ERROR glGENLISTS!!!!!!!!!!\n";
+        return;
+    }
+
+    glNewList(glLabs[3],GL_COMPILE);
+
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(1,1,1);
+    glTexCoord2f(0, 0);     glVertex3f(1+diverge,0+diverge,0+diverge);
+    glTexCoord2f(1, 0);     glVertex3f(0+diverge,1+diverge,0+diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f(0+diverge,0+diverge,1+diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(-1,1,-1);
+    glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0-diverge, 0+diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0+diverge,-1-diverge, 0+diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0-diverge, 1+diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(-1,-1,1);
+    glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0-diverge, 0+diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0-diverge,-1-diverge, 0+diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0-diverge, 1+diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(1,-1,-1);
+    glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0+diverge, 0+diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0-diverge, 1+diverge, 0+diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0+diverge, 1+diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(-1,-1,1);
+    glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0+diverge, 0-diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0+diverge, 1+diverge, 0-diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0+diverge,-1-diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(1,-1,-1);
+    glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0-diverge, 0-diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0+diverge,-1-diverge, 0-diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0-diverge,-1-diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(1,1,1);
+    glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0-diverge, 0-diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0-diverge,-1-diverge, 0-diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0-diverge,-1-diverge);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_TRIANGLES);
+    glNormal3f(-1,1,-1);
+    glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0+diverge, 0-diverge);
+    glTexCoord2f(1, 0);     glVertex3f( 0-diverge, 1+diverge, 0-diverge);
+    glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0+diverge,-1-diverge);
+
+    glEnd();
+
+    glEndList();
+
+
 }
 
 void olala(GLfloat x, GLfloat y, GLfloat z) {
@@ -343,8 +422,8 @@ void display(void)
         glPushMatrix();
         glLoadIdentity();
 
-        glTranslatef(0, 0, range);
-        glRotatef(rotateAbit, 0.0, 1.0, 0.0);
+        glTranslatef(0, 0, -10);
+        glRotatef(rotateAbit, 0.0f, 0.3f, 0.0f);
 
         glLightfv(GL_LIGHT0, GL_POSITION, pos);
         glTranslatef(pos[0], pos[1], pos[2]);
@@ -419,7 +498,10 @@ void keyboard(unsigned char c, int x, int y)
             dmode = 3;
             glDisable(GL_TEXTURE_2D);
             break;
-
+        case '4':
+            dmode = 4;
+            glEnable(GL_TEXTURE_2D);
+            break;
 
         case 'd':
             alrRotX+=0.1;
@@ -444,7 +526,7 @@ void keyboard(unsigned char c, int x, int y)
             lm = !lm;
             break;
         case 'f':
-            AlphaChannel == 1.f ? AlphaChannel = 0.2f : AlphaChannel = 1.f;
+            AlphaChannel == 1.f ? AlphaChannel = 0.5f : AlphaChannel = 1.f;
             draw3();
             draw7();
             break;
@@ -472,7 +554,7 @@ int main(int argc, char** argv){
 
     glDisable(GL_DEPTH_TEST);
     glDeleteTextures(8, textures);
-    glDeleteLists(glLabs[0],3);
+    glDeleteLists(glLabs[0],4);
     return 0;
 }
 
