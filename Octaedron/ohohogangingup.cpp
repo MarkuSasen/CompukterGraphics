@@ -6,11 +6,11 @@
 
 GLfloat alrRotX, alrRotY;
 GLfloat XROTATE = 0, YROTATE = -0.1;
-GLfloat rotateAbit = 1, deltaRotAbit = 0.1;
-GLfloat pos[4] = {2,0,5.5,1};
+GLfloat rotateAbit = 1, deltaRotAbit = 0.3;
+GLfloat pos[4]{1,0,3.2f,1};
 int dmode = 1;
 float diverge = 0.05;
-bool btext = false;
+bool turnsphere = false;
 GLfloat range = -5;
 
 void draw3();
@@ -48,7 +48,7 @@ void draw3()
 {
     glDeleteLists(glLabs[0], 1);
 
-    glLabs[0] = glGenLists(3);
+    glLabs[0] = glGenLists(5);
 
     if(!glIsList(glLabs[0]))
     {
@@ -58,16 +58,20 @@ void draw3()
 
     glNewList(glLabs[0],GL_COMPILE);
 
-    glBegin(GL_TRIANGLES);
+    if(AlphaChannel == 1.f)
+        glDepthMask(GL_TRUE);
+    else glDepthMask(GL_FALSE);
 
-    glColor4f(1.0,0.5,0.0, AlphaChannel);    //// оранжевый
+
+    glBegin(GL_TRIANGLES);
+    glColor4f(1.0,0.55,0.0,AlphaChannel);    //// оранжевый
     glNormal3f(1,1,1);
     glVertex3f( 1 + diverge, 0 + diverge, 0 + diverge);
     glVertex3f( 0 + diverge, 1 + diverge, 0 + diverge);
     glVertex3f( 0 + diverge, 0 + diverge, 1 + diverge);
 
 
-    glColor4f(1.0,0.9,0.0, AlphaChannel);    //// желтый
+    glColor4f(1.0,0.92,0.0, AlphaChannel);    //// желтый
     glNormal3f(-1,1,-1);
     glVertex3f( 1+diverge, 0-diverge, 0+diverge);
     glVertex3f( 0+diverge,-1-diverge, 0+diverge);
@@ -79,6 +83,12 @@ void draw3()
     glVertex3f(-1-diverge, 0-diverge, 0+diverge);
     glVertex3f( 0-diverge,-1-diverge, 0+diverge);
     glVertex3f( 0-diverge, 0-diverge, 1+diverge);
+
+    glColor4f(0.55f,0.22f,0.28f, AlphaChannel);    //// красный
+    glNormal3f(1,1,1);
+    glVertex3f(-1-diverge, 0-diverge, 0-diverge);
+    glVertex3f( 0-diverge,-1-diverge, 0-diverge);
+    glVertex3f( 0-diverge, 0-diverge,-1-diverge);
 
     glColor4f(0.0,1.0,0.0, AlphaChannel);    ////зеленый
     glNormal3f(1,-1,-1);
@@ -98,11 +108,6 @@ void draw3()
     glVertex3f( 0+diverge,-1-diverge, 0-diverge);
     glVertex3f( 0+diverge, 0-diverge,-1-diverge);
 
-    glColor4f(1.0,0.0,0.0, AlphaChannel);    //// красный
-    glNormal3f(1,1,1);
-    glVertex3f(-1-diverge, 0-diverge, 0-diverge);
-    glVertex3f( 0-diverge,-1-diverge, 0-diverge);
-    glVertex3f( 0-diverge, 0-diverge,-1-diverge);
 
     glNormal3f(-1,1,-1);
     glColor4f(1.0,0.0,0.0, AlphaChannel);
@@ -115,6 +120,7 @@ void draw3()
     glVertex3f( 0-diverge, 0+diverge,-1-diverge);
 
     glEnd();
+    glDepthMask(GL_TRUE);
 
     glEndList();
 
@@ -155,7 +161,8 @@ void draw4()
         std::cout << src->size() << std::endl;
 
         src->clear();
-
+        
+        glColor4f(1.f,1.f,1.f,1.f);
         glBindTexture(GL_TEXTURE_2D, textures[i]);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_NEAREST );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_NEAREST );
@@ -165,7 +172,8 @@ void draw4()
 
     delete src;
 
-    glLabs[1] = glGenLists(3);
+    glDeleteLists(glLabs[1], 1);
+    glLabs[1] = glGenLists(5);
 
     if(!glIsList(glLabs[1]))
     {
@@ -173,8 +181,16 @@ void draw4()
         return;
     }
 
+
+
+
     glNewList(glLabs[1],GL_COMPILE);
 
+    if(AlphaChannel == 1.f)
+        glDepthMask(GL_TRUE);
+    else glDepthMask(GL_FALSE);
+
+    glColor4f(1,1,1,AlphaChannel);
 
     glBindTexture(GL_TEXTURE_2D, textures[0]);
     glBegin(GL_TRIANGLES);
@@ -240,21 +256,26 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0+diverge,-1-diverge);
 
     glEnd();
-
+        glDepthMask(GL_TRUE);
     glEndList();
 
-    glLabs[3] = glGenLists(5);
+    glDeleteLists(glLabs[2], 1);
+    glLabs[2] = glGenLists(5);
 
-    if(!glIsList(glLabs[3]))
+    if(!glIsList(glLabs[2]))
     {
         std::cerr << "CRITICAL ERROR glGENLISTS!!!!!!!!!!\n";
         return;
     }
 
-    glNewList(glLabs[3],GL_COMPILE);
+    glNewList(glLabs[2],GL_COMPILE);
 
+    if(AlphaChannel == 1.f)
+        glDepthMask(GL_TRUE);
+    else glDepthMask(GL_FALSE);
 
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glColor4f(1.f,1.f,1.f,AlphaChannel);
+    glBindTexture(GL_TEXTURE_2D, textures[2]);
     glBegin(GL_TRIANGLES);
     glNormal3f(1,1,1);
     glTexCoord2f(0, 0);     glVertex3f(1+diverge,0+diverge,0+diverge);
@@ -262,7 +283,8 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f(0+diverge,0+diverge,1+diverge);
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glColor4f(1.f,1.f,1.f,AlphaChannel);
+    glBindTexture(GL_TEXTURE_2D, textures[7]);
     glBegin(GL_TRIANGLES);
     glNormal3f(-1,1,-1);
     glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0-diverge, 0+diverge);
@@ -270,7 +292,8 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0-diverge, 1+diverge);
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glColor4f(1.f,1.f,1.f,AlphaChannel);
+    glBindTexture(GL_TEXTURE_2D, textures[7]);
     glBegin(GL_TRIANGLES);
     glNormal3f(-1,-1,1);
     glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0-diverge, 0+diverge);
@@ -278,7 +301,8 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0-diverge, 1+diverge);
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glColor4f(1.f,1.f,1.f,AlphaChannel);
+    glBindTexture(GL_TEXTURE_2D, textures[7]);
     glBegin(GL_TRIANGLES);
     glNormal3f(1,-1,-1);
     glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0+diverge, 0+diverge);
@@ -286,7 +310,8 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0+diverge, 1+diverge);
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glColor4f(1.f,1.f,1.f,AlphaChannel);
+    glBindTexture(GL_TEXTURE_2D, textures[7]);
     glBegin(GL_TRIANGLES);
     glNormal3f(-1,-1,1);
     glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0+diverge, 0-diverge);
@@ -294,7 +319,8 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0+diverge,-1-diverge);
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glColor4f(1.f,1.f,1.f,AlphaChannel);
+    glBindTexture(GL_TEXTURE_2D, textures[7]);
     glBegin(GL_TRIANGLES);
     glNormal3f(1,-1,-1);
     glTexCoord2f(0, 0);     glVertex3f( 1+diverge, 0-diverge, 0-diverge);
@@ -302,7 +328,8 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f( 0+diverge, 0-diverge,-1-diverge);
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glColor4f(1.f,1.f,1.f,AlphaChannel);
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
     glBegin(GL_TRIANGLES);
     glNormal3f(1,1,1);
     glTexCoord2f(0, 0);     glVertex3f(-1-diverge, 0-diverge, 0-diverge);
@@ -310,6 +337,7 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0-diverge,-1-diverge);
     glEnd();
 
+    glColor4f(1.f,1.f,1.f,AlphaChannel);
     glBindTexture(GL_TEXTURE_2D, textures[0]);
     glBegin(GL_TRIANGLES);
     glNormal3f(-1,1,-1);
@@ -318,10 +346,8 @@ void draw4()
     glTexCoord2f(0.5, 1);   glVertex3f( 0-diverge, 0+diverge,-1-diverge);
 
     glEnd();
-
+        glDepthMask(GL_TRUE);
     glEndList();
-
-
 }
 
 void olala(GLfloat x, GLfloat y, GLfloat z) {
@@ -345,18 +371,24 @@ void olala(GLfloat x, GLfloat y, GLfloat z) {
 
 void draw7() {
 
-    glDeleteLists(glLabs[2], 1);
-    glLabs[2] = glGenLists(4);
+    glDeleteLists(glLabs[3], 1);
+    glLabs[3] = glGenLists(5);
 
-    if (!glIsList(glLabs[2])) {
+    if (!glIsList(glLabs[3])) {
         std::cerr << "CRITICAL ERROR glGENLISTS!!!!!!!!!!\n";
         return;
     }
 
-    glNewList(glLabs[2],GL_COMPILE);
-        glMatrixMode(GL_MODELVIEW);
+    glNewList(glLabs[3],GL_COMPILE);
 
     glPushMatrix();
+
+    if(AlphaChannel == 1.f)
+        glDepthMask(GL_TRUE);
+    else glDepthMask(GL_FALSE);
+
+    glMatrixMode(GL_MODELVIEW);
+
         glTranslatef(diverge,diverge,diverge);
         glColor4f(1.0f,0.0f,0.0f,AlphaChannel);
         olala(1.f,1.f,1.f);
@@ -405,6 +437,7 @@ void draw7() {
         glColor4f(1.0f,0.0f,0.0f,AlphaChannel);
         olala(1.f,1.f,1.f);
         glTranslatef(-diverge,-diverge,-diverge);
+        glDepthMask(GL_TRUE);
     glPopMatrix();
 
     glEndList();
@@ -423,17 +456,18 @@ void display(void)
         glLoadIdentity();
 
         glTranslatef(0, 0, -10);
-        glRotatef(rotateAbit, 0.0f, 0.3f, 0.0f);
 
-        glLightfv(GL_LIGHT0, GL_POSITION, pos);
-        glTranslatef(pos[0], pos[1], pos[2]);
+            glRotatef(rotateAbit, 0.0f, 0.3f, 0.0f);
+            glTranslatef(pos[0], pos[1], pos[2]);
+            glLightfv(GL_LIGHT0, GL_POSITION, pos);
+
 
         glColor4d(1.0, 1.0, 1.0, 1.0);
         GLUquadricObj *quad = gluNewQuadric();
         gluQuadricDrawStyle(quad, GLU_LINE);
         gluSphere(quad, 0.25, 10, 10);
 
-        glPopMatrix();
+    glPopMatrix();
 
 
     ////////////////////////////////////////////////
@@ -446,7 +480,136 @@ void display(void)
     //glColor4d(1.0,1.0,1.0,1.0);
     glIsEnabled(GL_TEXTURE_2D) ?
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE) : void();
-    glCallList(glLabs[dmode-1]);
+
+
+    if(dmode == 2 || dmode == 3)
+        glCallList(glLabs[dmode-1]);
+    else if(dmode == 4) {
+        glCallList(glLabs[3]);
+        //glPushMatrix();
+
+//        if(AlphaChannel == 1.f)
+//            glDepthMask(GL_TRUE);
+//        else glDepthMask(GL_FALSE);
+//
+//        glTranslatef(diverge,diverge,diverge);
+//        glColor4f(1.0f,0.0f,0.0f,AlphaChannel);
+//        olala(1.f,1.f,1.f);
+//        glTranslatef(-diverge,-diverge,-diverge);
+//        glRotatef(90.f,0.0f,1.0f,0.0f);
+//
+//        glTranslatef(diverge,diverge,diverge);
+//        glColor4f(1.0f,0.5f,0.0f,AlphaChannel);
+//        olala(1.f,1.f,1.f);
+//        glTranslatef(-diverge,-diverge,-diverge);
+//        glRotatef(90.f,0.0f,1.0f,0.0f);
+//
+//        glTranslatef(diverge,diverge,diverge);
+//        glColor4f(1.0f,0.9f,0.0f,AlphaChannel);
+//        olala(1.f,1.f,1.f);
+//        glTranslatef(-diverge,-diverge,-diverge);
+//        glRotatef(90.f,0.0f,1.0f,0.0f);
+//
+//        glTranslatef(diverge,diverge,diverge);
+//        glColor4f(0.0f,1.0f,0.0f,AlphaChannel);
+//        olala(1.f,1.f,1.f);
+//        glTranslatef(-diverge,-diverge,-diverge);
+//        glRotatef(90.f,0.0f,1.0f,0.0f);
+//
+//        glRotatef(180.f,1.0f,0.0f,0.0f);
+//
+//        glTranslatef(diverge,diverge,diverge);
+//        glColor4f(0.0f,0.9f,0.9f,AlphaChannel);
+//        olala(1.f,1.f,1.f);
+//        glTranslatef(-diverge,-diverge,-diverge);
+//        glRotatef(90.f,0.0f,1.0f,0.0f);
+//
+//        glTranslatef(diverge,diverge,diverge);
+//        glColor4f(0.0f,0.0f,1.0f,AlphaChannel);
+//        olala(1.f,1.f,1.f);
+//        glTranslatef(-diverge,-diverge,-diverge);
+//        glRotatef(90.f,0.0f,1.0f,0.0f);
+//
+//        glTranslatef(diverge,diverge,diverge);
+//        glColor4f(0.8f,0.0f,0.8f,AlphaChannel);
+//        olala(1.f,1.f,1.f);
+//        glTranslatef(-diverge,-diverge,-diverge);
+//        glRotatef(90.f,0.0f,1.0f,0.0f);
+//
+//        glTranslatef(diverge,diverge,diverge);
+//        glColor4f(1.0f,0.0f,0.0f,AlphaChannel);
+//        olala(1.f,1.f,1.f);
+//        glTranslatef(-diverge,-diverge,-diverge);
+//        glDepthMask(GL_TRUE);
+//
+//        glPopMatrix();
+    }
+    else if(dmode == 1){
+    glCallList(glLabs[0]);
+//        if(AlphaChannel == 1.f)
+//            glDepthMask(GL_TRUE);
+//        else glDepthMask(GL_FALSE);
+
+//        glBegin(GL_TRIANGLES);
+//        glColor4f(1.0,0.55,0.0,AlphaChannel);    //// оранжевый
+//        glNormal3f(1,1,1);
+//        glVertex3f( 1 + diverge, 0 + diverge, 0 + diverge);
+//        glVertex3f( 0 + diverge, 1 + diverge, 0 + diverge);
+//        glVertex3f( 0 + diverge, 0 + diverge, 1 + diverge);
+//
+//
+//        glColor4f(1.0,0.92,0.0, AlphaChannel);    //// желтый
+//        glNormal3f(-1,1,-1);
+//        glVertex3f( 1+diverge, 0-diverge, 0+diverge);
+//        glVertex3f( 0+diverge,-1-diverge, 0+diverge);
+//        glVertex3f( 0+diverge, 0-diverge, 1+diverge);
+//
+//
+//        glColor4f(0.8,0.0,0.8, AlphaChannel);    //// фиолет
+//        glNormal3f(-1,-1,1);
+//        glVertex3f(-1-diverge, 0-diverge, 0+diverge);
+//        glVertex3f( 0-diverge,-1-diverge, 0+diverge);
+//        glVertex3f( 0-diverge, 0-diverge, 1+diverge);
+//
+//        glColor4f(0.55f,0.22f,0.28f, AlphaChannel);    //// красный
+//        glNormal3f(1,1,1);
+//        glVertex3f(-1-diverge, 0-diverge, 0-diverge);
+//        glVertex3f( 0-diverge,-1-diverge, 0-diverge);
+//        glVertex3f( 0-diverge, 0-diverge,-1-diverge);
+//
+//        glColor4f(0.0,1.0,0.0, AlphaChannel);    ////зеленый
+//        glNormal3f(1,-1,-1);
+//        glVertex3f(-1-diverge, 0+diverge, 0+diverge);
+//        glVertex3f( 0-diverge, 1+diverge, 0+diverge);
+//        glVertex3f( 0-diverge, 0+diverge, 1+diverge);
+//
+//        glColor4f(0.0,0.9,0.9, AlphaChannel);    //// голубой
+//        glNormal3f(-1,-1,1);
+//        glVertex3f( 1+diverge, 0+diverge, 0-diverge);
+//        glVertex3f( 0+diverge, 1+diverge, 0-diverge);
+//        glVertex3f( 0+diverge, 0+diverge,-1-diverge);
+//
+//        glColor4f(0.0,0.0,1.0, AlphaChannel);    //// синий
+//        glNormal3f(1,-1,-1);
+//        glVertex3f( 1+diverge, 0-diverge, 0-diverge);
+//        glVertex3f( 0+diverge,-1-diverge, 0-diverge);
+//        glVertex3f( 0+diverge, 0-diverge,-1-diverge);
+//
+//
+//        glNormal3f(-1,1,-1);
+//        glColor4f(1.0,0.0,0.0, AlphaChannel);
+//        glVertex3f(-1-diverge, 0+diverge, 0-diverge);
+//
+//        glColor4f(0.0,1.0,0.0, AlphaChannel);
+//        glVertex3f( 0-diverge, 1+diverge, 0-diverge);
+//
+//        glColor4f(0.0,0.0,1.0, AlphaChannel);
+//        glVertex3f( 0-diverge, 0+diverge,-1-diverge);
+//
+//        glEnd();
+//        glDepthMask(GL_TRUE);
+
+    }
 
     glFlush();
 
@@ -455,7 +618,10 @@ void display(void)
 GLfloat incX = 0, incY = 0;
 void loop(int time)
 {
-    if(lm) rotateAbit += deltaRotAbit;
+    if(lm)
+        if(!turnsphere)
+            rotateAbit += deltaRotAbit;
+        else rotateAbit -= deltaRotAbit;
     //if(alrRotX != 0)  alrRotX+=incX;
     //if(alrRotY != 0)  alrRotY+=incY;
 
@@ -482,6 +648,10 @@ void keyboard(unsigned char c, int x, int y)
     switch(c)
     {
 
+        if(AlphaChannel == 1.f)
+            glDepthMask(GL_TRUE);
+        else glDepthMask(GL_FALSE);
+
         case 'l':
             glIsEnabled(GL_LIGHT0) ? glDisable(GL_LIGHT0) : glEnable(GL_LIGHT0);
             break;
@@ -496,11 +666,11 @@ void keyboard(unsigned char c, int x, int y)
             break;
         case '3':
             dmode = 3;
-            glDisable(GL_TEXTURE_2D);
+            glEnable(GL_TEXTURE_2D);
             break;
         case '4':
             dmode = 4;
-            glEnable(GL_TEXTURE_2D);
+            glDisable(GL_TEXTURE_2D);
             break;
 
         case 'd':
@@ -525,10 +695,21 @@ void keyboard(unsigned char c, int x, int y)
         case 'p':
             lm = !lm;
             break;
+        case 'b':
+            turnsphere = !turnsphere;
+            break;
         case 'f':
-            AlphaChannel == 1.f ? AlphaChannel = 0.5f : AlphaChannel = 1.f;
-            draw3();
-            draw7();
+            if(AlphaChannel == 1.f) {
+                AlphaChannel = 0.5f;
+                draw3();
+                draw4();
+                draw7();
+            } else {
+                AlphaChannel = 1.f;
+                draw3();
+                draw4();
+                draw7();
+            }
             break;
     }
 }
